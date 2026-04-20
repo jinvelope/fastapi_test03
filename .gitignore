@@ -1,0 +1,32 @@
+# --- Python 관련 ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+bin/
+lib/
+include/
+dist/
+build/
+*.egg-info/
+
+# --- 데이터베이스 (SQLite) ---
+*.db
+*.sqlite3
+
+# --- 환경 설정 및 비밀번호 ---
+.env
+.venv
+.vscode/
+.idea/
+
+# --- OS 관련 ---
+.DS_Store
+Thumbs.db
+
+# --- 기타 ---
+*.log

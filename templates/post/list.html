@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { margin-top: 50px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .table thead { background-color: #007bff; color: white; }
+        /* 행에 마우스를 올렸을 때 포인터 변경 및 색상 변화 */
+        .table-hover tbody tr:hover { background-color: #f1f1f1; cursor: pointer; }
+        /* 링크 텍스트 꾸밈 제거 */
+        .post-link { text-decoration: none; color: inherit; display: block; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-primary m-0">글 목록</h3>
+            <a href="/" class="btn btn-outline-secondary btn-sm">홈으로</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# posts 데이터가 있을 경우 반복문 실행 #}
+                    {% if posts %}
+                        {% for post in posts %}
+                        <tr onclick="location.href='/post/{{ post.num }}'">
+                            <td>{{ post.num }}</td>
+                            <td class="text-start">
+                                <a href="/post/{{ post.num }}" class="post-link">
+                                    {{ post.title }}
+                                </a>
+                            </td>
+                            <td>{{ post.writer }}</td>
+                            <td>{{ post.created_at.strftime('%Y-%m-%d %H:%M') if post.created_at else '' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="py-5 text-muted">등록된 게시글이 없습니다.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-end mt-3">
+            <a href="/post/new" class="btn btn-primary">새 글 쓰기</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
