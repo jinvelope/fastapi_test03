@@ -99,27 +99,6 @@ def post_detail(request: Request, num: int, db: Session = Depends(get_db)):
         }
     )
 
-# 수정 폼 화면 요청
-@app.get("/post/edit/{num}", response_class=HTMLResponse)
-def edit_form(request: Request, num: int, db: Session = Depends(get_db)):
-    query = text("SELECT num, writer, title, content FROM post WHERE num = :num")
-    post = db.execute(query, {"num": num}).fetchone()
-    return templates.TemplateResponse(request=request, name="post/edit.html", context={"post": post})
-
-# 수정 처리 요청
-@app.post("/post/update")
-async def update_post(request: Request, db: Session = Depends(get_db)):
-    form = await request.form()
-    num = form.get("num")
-    title = form.get("title")
-    content = form.get("content")
-    
-    query = text("UPDATE post SET title=:title, content=:content WHERE num=:num")
-    db.execute(query, {"title": title, "content": content, "num": num})
-    db.commit()
-    
-    return RedirectResponse(url=f"/post/{num}", status_code=302)
-
 # 삭제 처리 요청
 @app.get("/post/delete/{num}")
 def delete_post(num: int, db: Session = Depends(get_db)):
@@ -128,4 +107,3 @@ def delete_post(num: int, db: Session = Depends(get_db)):
     db.commit()
     
     return RedirectResponse(url="/post", status_code=302)
-
