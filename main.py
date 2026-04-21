@@ -45,6 +45,31 @@ def fetPosts(request: Request, db:Session = Depends(get_db)):
         }
     )
 
+@app.get("/post/{num}", response_class=HTMLResponse)
+def post_detail(request: Request, num: int, db: Session = Depends(get_db)):
+    # 특정 번호의 게시글을 가져오기 위한 SQL
+    query = text("""
+                SELECT num, writer, title, content, created_at
+                FROM post
+                WHERE num = :num
+            """)
+    
+    # 파라미터 바인딩을 통해 안전하게 쿼리 실행
+    result = db.execute(query, {"num": num})
+    post = result.fetchone()
+    
+    if post is None:
+        # 글이 없을 경우 처리 (간단하게 홈으로 리다이렉트하거나 에러 페이지 출력)
+        return HTMLResponse(content="존재하지 않는 게시글입니다.", status_code=404)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="post/detail.html", # 상세 페이지 템플릿 파일명
+        context={
+            "post": post
+        }
+    )
+
 # 1. 작성 폼 화면 요청
 @app.get("/post/new", response_class=HTMLResponse)
 def new_post_form(request: Request):
@@ -77,6 +102,27 @@ def postNew(request: Request, writer: str = Form(...), title: str = Form(...), c
             "url":"/post"
         }
     )
+
+# 수정 폼 화면 요청
+@app.get("/post/edit/{num}", response_class=HTMLResponse)
+def edit_form(request: Request, num: int, db: Session = Depends(get_db)):
+    query = text("SELECT num, writer, title, content FROM post WHERE num = :num")
+    post = db.execute(query, {"num": num}).fetchone()
+    return templates.TemplateResponse(request=request, name="post/edit.html", context={"post": post})
+
+# 수정 처리 요청
+@app.post("/post/update")
+async def update_post(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    num = form.get("num")
+    title = form.get("title")
+    content = form.get("content")
+    
+    query = text("UPDATE post SET title=:title, content=:content WHERE num=:num")
+    db.execute(query, {"title": title, "content": content, "num": num})
+    db.commit()
+    
+    return RedirectResponse(url=f"/post/{num}", status_code=302)
 
 # 삭제 처리 요청
 @app.get("/post/delete/{num}")
